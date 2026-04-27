@@ -1,0 +1,71 @@
+@charset "UTF-8";
+@-moz-document url(chrome://browser/content/browser.xhtml) {
+
+/* Auto-hide entire toolbox (tabs, address bar, bookmarks) when maximized */
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background {
+  position: fixed !important;
+  top: 0 !important;
+  width: 100% !important;
+  z-index: 9999 !important; /* keep it above page content */
+  transform: translateY(calc(-100% + 1px)) !important; /* Hide with 1px peek */
+  transition: transform 150ms ease-out !important;
+  background-color: var(--toolbar-bgcolor, transparent) !important;
+}
+
+/* Keep address bar pinned at top, but still slide with toolbox - MODIFIED */
+#main-window[sizemode="maximized"] #urlbar {
+  transform: translateY(calc(-100% - 10px)) !important;
+  transition: transform 150ms ease-out !important;
+  right: 341px !important; /* Added horizontal shift */
+}
+
+/* Add semi-transparent background and border when hidden */
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:not(:hover) 
+toolbar#nav-bar.browser-toolbar.chromeclass-location 
+hbox#nav-bar-customization-target.customization-target 
+toolbaritem#urlbar-container 
+div#urlbar 
+hbox#urlbar-background {
+  background-color: rgba(0, 0, 0, 0.5) !important;
+  border: 1px solid #333 !important;
+  transition: background-color 150ms ease-out, border 150ms ease-out !important;
+  border-radius: 3px !important; /* optional, looks nicer */
+}
+
+/* Show toolbox and urlbar on hover or focus - MODIFIED */
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover,
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:focus-within {
+  transform: translateY(0) !important;
+}
+
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover #urlbar,
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:focus-within #urlbar {
+  transform: translateY(0) !important;
+  right: auto !important; /* Reset horizontal shift on hover/focus */
+}
+
+/* Remove background/border when hovered (restore normal style) */
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover 
+toolbar#nav-bar.browser-toolbar.chromeclass-location 
+hbox#nav-bar-customization-target.customization-target 
+toolbaritem#urlbar-container 
+div#urlbar 
+hbox#urlbar-background {
+  border: none !important;
+}
+
+/* Prevent content from overlapping or jumping when toolbox hides */
+#main-window[sizemode="maximized"] #browser {
+  margin-top: 1px !important;
+  z-index: 0 !important; /* content stays below the toolbox */
+}
+
+/* Optional: Keep bookmarks bar hidden unless toolbox is hovered */
+#main-window[sizemode="maximized"] #PersonalToolbar {
+  visibility: collapse !important;
+}
+#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover #PersonalToolbar {
+  visibility: visible !important;
+}
+
+}
