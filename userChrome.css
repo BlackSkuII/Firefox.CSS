@@ -1,70 +1,68 @@
+/*************************************************************************************************************************************************************************************************************************************************************
+
+"userChrome.css" is a custom CSS file that can be used to specify CSS style rules for Floorp's interface (NOT internal site) using "chrome" privileges.
+For instance, if you want to hide the tab bar, you can use the following CSS rule:
+
+**************************************
+#TabsToolbar {                       *
+    display: none !important;        *
+}                                    *
+**************************************
+
+NOTE: You can use the userChrome.css file without change preferences (about:config)
+
+Quote: https://userChrome.org | https://github.com/topics/userchrome 
+
+************************************************************************************************************************************************************************************************************************************************************/
+
 @charset "UTF-8";
 @-moz-document url(chrome://browser/content/browser.xhtml) {
 
 /* Auto-hide entire toolbox (tabs, address bar, bookmarks) when maximized */
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background {
+#main-window[sizemode="maximized"] #navigator-toolbox {
   position: fixed !important;
   top: 0 !important;
-  width: 100% !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100vw !important; /* Force full width */
   z-index: 9999 !important; /* keep it above page content */
-  transform: translateY(calc(-100% + 1px)) !important; /* Hide with 1px peek */
+  transform: translateY(calc(-100% + 2px)) !important; /* Hide with 2px peek (more reliable than 1px) */
   transition: transform 150ms ease-out !important;
   background-color: var(--toolbar-bgcolor, transparent) !important;
 }
 
-/* Keep address bar pinned at top, but still slide with toolbox - MODIFIED */
-#main-window[sizemode="maximized"] #urlbar {
-  transform: translateY(calc(-100% - 10px)) !important;
-  transition: transform 150ms ease-out !important;
-  right: 341px !important; /* Added horizontal shift */
+/* Show toolbox on hover or focus */
+#main-window[sizemode="maximized"] #navigator-toolbox:hover,
+#main-window[sizemode="maximized"] #navigator-toolbox:focus-within {
+  transform: translateY(0) !important;
 }
 
-/* Add semi-transparent background and border when hidden */
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:not(:hover) 
-toolbar#nav-bar.browser-toolbar.chromeclass-location 
-hbox#nav-bar-customization-target.customization-target 
-toolbaritem#urlbar-container 
-div#urlbar 
-hbox#urlbar-background {
+/* Add semi-transparent background and border to urlbar when toolbox is hidden */
+#main-window[sizemode="maximized"] #navigator-toolbox:not(:hover):not(:focus-within) #urlbar-background {
   background-color: rgba(0, 0, 0, 0.5) !important;
   border: 1px solid #333 !important;
+  border-radius: 3px !important;
   transition: background-color 150ms ease-out, border 150ms ease-out !important;
-  border-radius: 3px !important; /* optional, looks nicer */
 }
 
-/* Show toolbox and urlbar on hover or focus - MODIFIED */
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover,
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:focus-within {
-  transform: translateY(0) !important;
-}
-
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover #urlbar,
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:focus-within #urlbar {
-  transform: translateY(0) !important;
-  right: auto !important; /* Reset horizontal shift on hover/focus */
-}
-
-/* Remove background/border when hovered (restore normal style) */
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover 
-toolbar#nav-bar.browser-toolbar.chromeclass-location 
-hbox#nav-bar-customization-target.customization-target 
-toolbaritem#urlbar-container 
-div#urlbar 
-hbox#urlbar-background {
+/* Remove urlbar border when toolbox is hovered (restore normal style) */
+#main-window[sizemode="maximized"] #navigator-toolbox:hover #urlbar-background,
+#main-window[sizemode="maximized"] #navigator-toolbox:focus-within #urlbar-background {
   border: none !important;
 }
 
 /* Prevent content from overlapping or jumping when toolbox hides */
 #main-window[sizemode="maximized"] #browser {
-  margin-top: 1px !important;
+  margin-top: 2px !important; /* Matches the 2px peek amount */
   z-index: 0 !important; /* content stays below the toolbox */
 }
 
-/* Optional: Keep bookmarks bar hidden unless toolbox is hovered */
+/* Keep bookmarks bar hidden unless toolbox is hovered */
 #main-window[sizemode="maximized"] #PersonalToolbar {
   visibility: collapse !important;
 }
-#main-window[sizemode="maximized"] toolbox#navigator-toolbox.browser-toolbox-background:hover #PersonalToolbar {
+#main-window[sizemode="maximized"] #navigator-toolbox:hover #PersonalToolbar,
+#main-window[sizemode="maximized"] #navigator-toolbox:focus-within #PersonalToolbar {
   visibility: visible !important;
 }
 
